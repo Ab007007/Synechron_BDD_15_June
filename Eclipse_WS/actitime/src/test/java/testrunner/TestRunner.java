@@ -9,8 +9,8 @@ import io.cucumber.junit.CucumberOptions;
 @CucumberOptions(
 		features = "src/test/java/feature/",
 		glue = {"stepdefinitons"},
-		tags = "@development",
-//		tags = "@google and @regression",
+//		tags = "@development",
+		tags = "@google and @regression",
 //		tags = "@google or @regression",
 //		tags = "@regression and not @smoke",
 //		dryRun = true,
