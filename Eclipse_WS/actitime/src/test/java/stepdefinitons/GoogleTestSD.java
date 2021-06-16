@@ -5,22 +5,70 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import io.cucumber.java.After;
+import io.cucumber.java.AfterStep;
+import io.cucumber.java.Before;
+import io.cucumber.java.BeforeStep;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import sun.print.resources.serviceui;
 
 public class GoogleTestSD extends BaseClass
 {
 
+	@Before
+	public void beforeScenario()
+	{
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+	}
+	@Before("@google")
+	public void launchGooglePage()
+	{
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+	}
+	@Before("@actitime")
+	public void launchActitime()
+	{
+		System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+	}
+	
+	
+	@After
+	public void afterScenario(Scenario sc)
+	{
+		System.out.println("################################################################");
+		
+	}
+	
+	@After("@google and @development")
+	public void afterScenarioForGoogle(Scenario sc)
+	{
+		System.out.println("################################################################");
+		System.out.println(sc.getName());
+		System.out.println(sc.getStatus());
+		System.out.println(sc.getId());
+		System.out.println("################################################################");
+	}
+	
+	
+	@BeforeStep
+	public void beforeStep()
+	{
+		System.out.println("----------------------------------------------");
+	}
+	
+	@AfterStep
+	public void afterStep()
+	{
+		System.out.println(".....................................................");
+	}
 	
 	@Given("user is on google page")
 	public void user_is_on_google_page() {

@@ -8,16 +8,24 @@ import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.After;
+import io.cucumber.java.AfterStep;
+import io.cucumber.java.Before;
+import io.cucumber.java.BeforeStep;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class ActitimeTestSD extends BaseClass {
+
+	String customerName;
 
 	@Given("user is on login page")
 	public void user_is_on_login_page() {
@@ -29,7 +37,7 @@ public class ActitimeTestSD extends BaseClass {
 
 	}
 
-	@When("user enter (in)valid {} and {}")
+	@When("user enter (in)valid {} and/or {}")
 	public void user_enter_valid_username_and_password(String un, String pwd) {
 		driver.findElement(By.id("username")).sendKeys(un);
 		driver.findElement(By.name("pwd")).sendKeys(pwd);
@@ -98,6 +106,7 @@ public class ActitimeTestSD extends BaseClass {
 
 	@Then("Enter {} and {}")
 	public void enter_and_and_click_on_create_customer_button(String cn, String cd) {
+		customerName = cn;
 		driver.findElement(By.id("customerLightBox_nameField")).sendKeys(cn);
 		driver.findElement(By.id("customerLightBox_descriptionField")).sendKeys(cd);
 	}
@@ -109,7 +118,8 @@ public class ActitimeTestSD extends BaseClass {
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 		WebElement toastEle = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
-		System.out.println("**********************************************" + toastEle.getText());
+		String successMsg = toastEle.getText();
+		System.out.println("**********************************************" + successMsg);
 		wait.until(ExpectedConditions.invisibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
 	}
 
@@ -117,13 +127,11 @@ public class ActitimeTestSD extends BaseClass {
 
 	// Data table using MAPS
 	@Then("click create customer by entering customer details from datatable")
-	public void click_create_customer_by_entering_customer_details_from_datatable(DataTable dataTable) 
-	{
+	public void click_create_customer_by_entering_customer_details_from_datatable(DataTable dataTable) {
 		List<Map<String, String>> data = dataTable.asMaps();
 		System.out.println("Total elements in the List " + data.size());
 		String cn, cd;
-		for(int i =0; i< data.size(); i++)
-		{
+		for (int i = 0; i < data.size(); i++) {
 			cn = data.get(i).get("customername");
 			cd = data.get(i).get("customerdesc");
 			driver.findElement(By.xpath("//div[text()='Add New']")).click();
@@ -137,19 +145,18 @@ public class ActitimeTestSD extends BaseClass {
 					.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
 			System.out.println("**********************************************" + toastEle.getText());
 			wait.until(ExpectedConditions.invisibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
-			
+
 		}
-		
+
 	}
-	
+
 	// Data table using LISTS
 	@Then("click create customer by entering customer details from list datatable")
 	public void click_create_customer_by_entering_customer_details_from_list_datatable(DataTable dataTable) {
-		 List<List<String>> data = dataTable.asLists();
+		List<List<String>> data = dataTable.asLists();
 		System.out.println("Total elements in the List " + data.size());
 		String cn, cd;
-		for(int i =0; i< data.size(); i++)
-		{
+		for (int i = 0; i < data.size(); i++) {
 			cn = data.get(i).get(0);
 			cd = data.get(i).get(1);
 			driver.findElement(By.xpath("//div[text()='Add New']")).click();
@@ -163,35 +170,52 @@ public class ActitimeTestSD extends BaseClass {
 					.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
 			System.out.println("**********************************************" + toastEle.getText());
 			wait.until(ExpectedConditions.invisibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
-			
+
 		}
 	}
 
+	// delete customer code
+	@When("user search for the existing customer {string}")
+	public void user_search_for_the_existing_customer(String string) {
+		driver.findElement(By.xpath("//div[@id='cpTreeBlock']//input")).sendKeys(string);
+	}
 
+	@When("user click on Actions Button present in CustomerDetails page")
+	public void user_click_on_actions_button_present_in_customer_details_page() throws InterruptedException {
 
-	
+		// div[@class='node allCustomersNode selected']/following-sibling::div
+		Actions act = new Actions(driver);
+		act.moveToElement(
+				driver.findElement(By.xpath
+						("//div[@class='node allCustomersNode selected']/following-sibling::div")))
+				.perform();
+		Thread.sleep(2000);
+
+		driver.findElement(By.xpath(
+				"//div[@class='node allCustomersNode selected']/following-sibling::div/div[@class='editButton available']"))
+				.click();
+
+		driver.findElement(By.xpath
+				("//div[@class='edit_customer_sliding_panel sliding_panel']//div[text()='ACTIONS']"))
+				.click();
+
+	}
+
+	@When("click on Delete button")
+	public void click_on_delete_button() {
+		driver.findElement(By.xpath("//div[@class='edit_customer_sliding_panel sliding_panel']//div[text()='Delete']"))
+				.click();
+	}
+
+	@Then("click on Delete pemanently and validate the success message")
+	public void click_on_delete_pemanently_and_validate_the_success_message() {
+		driver.findElement(By.id("customerPanel_deleteConfirm_submitTitle")).click();
+		WebDriverWait wait = new WebDriverWait(driver, 30);
+		WebElement toastEle = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
+		System.out.println("**********************************************" + toastEle.getText());
+		wait.until(ExpectedConditions.invisibilityOf(driver.findElement(By.xpath("//div[@class='toast']"))));
+
+	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
